@@ -14,6 +14,8 @@ namespace WatchMe.Models
         [StringLength(500)]
         [Column(TypeName = "nvarchar(500)")]
         public string? Description { get; set; }
+
+        public bool Passive { get; set; }
         public List<MediaCategory>? MediaCategories { get; set; }
 
         public List<MediaDirector>? MediaDirectors { get; set; }
