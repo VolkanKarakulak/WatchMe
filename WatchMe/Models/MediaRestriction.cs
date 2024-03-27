@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SoftItoFlix.Models
+namespace WatchMe.Models
 {
     public class MediaRestriction
     {

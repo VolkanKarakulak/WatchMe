@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SoftItoFlix.Data;
-using SoftItoFlix.Models;
+using WatchMe.Data;
+using WatchMe.Models;
 
-namespace SoftItoFlix.Controllers
+namespace WatchMe.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly SoftItoFlixContext _context;
+        private readonly WatchMeContext _context;
 
-        public CategoriesController(SoftItoFlixContext context)
+        public CategoriesController(WatchMeContext context)
         {
             _context = context;
         }
@@ -88,7 +88,7 @@ namespace SoftItoFlix.Controllers
         {
           if (_context.Categories == null)
           {
-              return Problem("Entity set 'SoftItoFlixContext.Category'  is null.");
+              return Problem("Entity set 'WatchMeContext.Category'  is null.");
           }
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();

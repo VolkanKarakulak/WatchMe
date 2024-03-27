@@ -1,4 +1,4 @@
-﻿namespace SoftItoFlix.Models
+﻿namespace WatchMe.Models
 {
     public class Person
     {

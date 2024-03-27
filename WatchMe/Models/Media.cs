@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace SoftItoFlix.Models
+namespace WatchMe.Models
 {
     public class Media
     {

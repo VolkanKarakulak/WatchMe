@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SoftItoFlix.Identity.Data;
-using SoftItoFlix.Models;
+using WatchMe.Identity.Data;
+using WatchMe.Models;
 
-namespace SoftItoFlix.Data
+namespace WatchMe.Data
 {
-    public class SoftItoFlixContext : IdentityDbContext<AppUser>
+    public class WatchMeContext : IdentityDbContext<AppUser>
     {
-        public SoftItoFlixContext (DbContextOptions<SoftItoFlixContext> options)
+        public WatchMeContext(DbContextOptions<WatchMeContext> options)
             : base(options)
         {
         }
@@ -24,8 +24,8 @@ namespace SoftItoFlix.Data
             // Add your customizations after calling base.OnModelCreating(builder);
         }
 
-        public DbSet<SoftItoFlix.Models.Category> Categories { get; set; } = default!;
+        public DbSet<WatchMe.Models.Category> Categories { get; set; } = default!;
 
-        
+
     }
 }

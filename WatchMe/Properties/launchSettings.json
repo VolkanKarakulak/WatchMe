@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "SoftItoFlix": {
+    "WatchMe": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

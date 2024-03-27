@@ -1,21 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SoftItoFlix.Data;
+using WatchMe.Data;
 using Microsoft.AspNetCore.Identity;
-using SoftItoFlix.Identity.Data;
+using WatchMe.Identity.Data;
 
-namespace SoftItoFlix
+namespace WatchMe
 {
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<SoftItoFlixContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SoftItoFlixContext") ?? throw new InvalidOperationException("Connection string 'SoftItoFlixContext' not found.")));
+            builder.Services.AddDbContext<WatchMeContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("WatchMeContext") ?? throw new InvalidOperationException("Connection string 'WatchMeContext' not found.")));
 
                         builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<SoftItoFlixContext>();
+                .AddEntityFrameworkStores<WatchMeContext>();
 
             // Add services to the container.
 
