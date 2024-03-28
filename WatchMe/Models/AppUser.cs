@@ -18,5 +18,9 @@ public class AppUser : IdentityUser<long>
     public string Name { get; set; } = "";
 
     public bool Passive { get; set; }
+
+    [NotMapped]
+    [StringLength(100, MinimumLength = 8)]
+    public string PassWord { get; set; } = "";
 }
 
