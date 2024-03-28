@@ -27,15 +27,6 @@ namespace WatchMe.Controllers
 
         // GET: api/AppUsers
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public ActionResult<List<AppUser>> GetUsers()
-        {
-
-            return _signInManager.UserManager.Users.Where(u => u.Passive).AsNoTracking().ToList();
-        }
-
-        // GET: api/AppUsers/5
-        [HttpGet]
         [Authorize(Roles = "Administrator")]
         public ActionResult<List<AppUser>> GetUsers(bool includePassive = true)
         {
@@ -46,6 +37,32 @@ namespace WatchMe.Controllers
                 users = users.Where(u => u.Passive == false);
             }
             return users.AsNoTracking().ToList();
+        }
+
+        // GET: api/AppUsers/5
+        [HttpGet("{id}")]
+        [Authorize]
+        public ActionResult<AppUser> GetAppUser(long id)
+        {
+            AppUser? appUser = null;
+
+            if (User.IsInRole("Admin") == false)
+            {
+                if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
+                {
+                    return Unauthorized();
+                }
+            }
+
+            appUser = _signInManager.UserManager.Users.Where(u => u.Id == id).FirstOrDefault();
+            
+
+            if (appUser == null)
+            {
+                 return NotFound();
+            }
+
+            return appUser;
         }
 
         // PUT: api/AppUsers/5
