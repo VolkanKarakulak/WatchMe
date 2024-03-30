@@ -26,14 +26,14 @@ namespace WatchMe.Controllers
         public ActionResult<List<Episode>> GetEpisodes()
         {
         
-            return  _context.Episodes.AsNoTracking().ToList();
+            return _context.Episodes.AsNoTracking().ToList();
         }
 
         // GET: api/Episodes/5
         [HttpGet("{id}")]
         public ActionResult<Episode> GetEpisode(long id)
         {
-          
+
           
             Episode? episode = _context.Episodes.Find(id);
 
@@ -70,7 +70,7 @@ namespace WatchMe.Controllers
         {
          
             _context.Episodes.Add(episode);
-             _context.SaveChanges();
+            _context.SaveChanges();
 
             return episode.Id;
         }

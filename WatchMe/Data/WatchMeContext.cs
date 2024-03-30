@@ -25,6 +25,7 @@ namespace WatchMe.Data
             builder.Entity<MediaStar>().HasKey(m=>new {m.MediaId, m.StarId});
             builder.Entity<UserFavorite>().HasKey(m=>new {m.UserId, m.MediaId});
             builder.Entity<UserWatched>().HasKey(m=>new {m.UserId, m.EpisodeId});
+            builder.Entity<Episode>().HasIndex(e => new { e.MediaId, e.SeasonNumber, e.EpisodeNumber }).IsUnique(true);
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);

@@ -19,15 +19,22 @@ namespace WatchMe.Controllers
     {
         //private readonly WatchMeContext _context;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly WatchMeContext _context;
 
-        public AppUsersController(SignInManager<AppUser> signInManager)
+        public struct LogInModel
+        {
+            public string UserName { get; set; }
+            public string Password { get; set; }
+        }
+        public AppUsersController(SignInManager<AppUser> signInManager, WatchMeContext context)
         {
             _signInManager = signInManager;
+            _context = context;
         }
 
         // GET: api/AppUsers
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         public ActionResult<List<AppUser>> GetUsers(bool includePassive = true)
         {
             IQueryable<AppUser> users = _signInManager.UserManager.Users;
@@ -41,18 +48,18 @@ namespace WatchMe.Controllers
 
         // GET: api/AppUsers/5
         [HttpGet("{id}")]
-        [Authorize]
+        //[Authorize]
         public ActionResult<AppUser> GetAppUser(long id)
         {
             AppUser? appUser = null;
 
-            if (User.IsInRole("Admin") == false)
-            {
-                if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
-                {
-                    return Unauthorized();
-                }
-            }
+            //if (User.IsInRole("Admin") == false)
+            //{
+            //    if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
+            //    {
+            //        return Unauthorized();
+            //    }
+            //}
 
             appUser = _signInManager.UserManager.Users.Where(u => u.Id == id).FirstOrDefault();
             
@@ -68,18 +75,18 @@ namespace WatchMe.Controllers
         // PUT: api/AppUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize]
+        //[Authorize]
         public  ActionResult  PutAppUser(AppUser appUser)
         {
             AppUser? user = null;
 
-            if (User.IsInRole("CustomerRepresantative") == false)
-            {
-                if (User.FindFirstValue(ClaimTypes.NameIdentifier) != appUser.Id.ToString())
-                {
-                    return Unauthorized();
-                }
-            }
+            //if (User.IsInRole("CustomerRepresantative") == false)
+            //{
+            //    if (User.FindFirstValue(ClaimTypes.NameIdentifier) != appUser.Id.ToString())
+            //    {
+            //        return Unauthorized();
+            //    }
+            //}
 
             user = _signInManager.UserManager.Users.Where(u => u.Id == appUser.Id).AsNoTracking().FirstOrDefault(); // asnotricking olmaz burda,oku ve unut diyemeyiz
 
@@ -144,6 +151,29 @@ namespace WatchMe.Controllers
             user.Passive = true;
             _signInManager.UserManager.UpdateAsync(user).Wait();
             return Ok();
+        }
+        [HttpPost("LogIn")]
+        public ActionResult<bool> LogIn(LogInModel logInModel)
+        {
+            Microsoft.AspNetCore.Identity.SignInResult signInResult;
+            AppUser applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result;
+
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            if (_context.UserPlans.Where(u => u.UserdId == applicationUser.Id && u.EndDate>= DateTime.Today).Any() == false) 
+            {
+                applicationUser.Passive = true;
+                _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
+
+            }
+            if (applicationUser.Passive == true)
+            {
+                return Content("Passive");
+            }
+            signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
+            return signInResult.Succeeded;
         }
     }
 }
