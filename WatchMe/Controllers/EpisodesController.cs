@@ -55,24 +55,8 @@ namespace WatchMe.Controllers
                 return BadRequest();
             }
 
-            //_context.Episodes.Update(episode);
+            _context.Episodes.Update(episode);
             //_context.Entry(episode).State = EntityState.Modified
-
-            var existingEpisode = _context.Episodes.Find(id);
-
-            if (existingEpisode == null)
-            {
-                return NotFound();
-            }
-
-            existingEpisode.EpisodeNumber = episode.EpisodeNumber;
-            existingEpisode.SeasonNumber = episode.SeasonNumber;
-            existingEpisode.Title = episode.Title;
-            existingEpisode.ReleaseDate = episode.ReleaseDate;
-            existingEpisode.Description =episode.Description;
-            existingEpisode.Duration = episode.Duration;
-            existingEpisode.Passive = episode.Passive;
-            existingEpisode.ViewCount = episode.ViewCount;
 
             try
             {
@@ -89,36 +73,31 @@ namespace WatchMe.Controllers
         // POST: api/Episodes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Episode>> PostEpisode(Episode episode)
+        public ActionResult<Episode> PostEpisode(Episode episode)
         {
           if (_context.Episodes == null)
           {
               return Problem("Entity set 'WatchMeContext.Episodes'  is null.");
           }
             _context.Episodes.Add(episode);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return CreatedAtAction("GetEpisode", new { id = episode.Id }, episode);
         }
 
         // DELETE: api/Episodes/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEpisode(long id)
+        public ActionResult DeleteEpisode(long id)
         {
-            if (_context.Episodes == null)
+            var episode = _context.Episodes.Find(id);
+
+            if(episode != null)
             {
-                return NotFound();
-            }
-            var episode = await _context.Episodes.FindAsync(id);
-            if (episode == null)
-            {
-                return NotFound();
+                episode.Passive = true;
+                _context.SaveChanges();
             }
 
-            _context.Episodes.Remove(episode);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok();
         }
 
         private bool EpisodeExists(long id)
