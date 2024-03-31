@@ -23,6 +23,8 @@ namespace WatchMe.Models
         [Column(TypeName = "nvarchar(500)")]
         public string? Description { get; set; }
         public TimeSpan Duration { get; set; }
+        public bool Passive { get; set; }
+        public long ViewCount { get; set; }
 
         [ForeignKey("MediaId")]
         public Media? Media { get; set; }
