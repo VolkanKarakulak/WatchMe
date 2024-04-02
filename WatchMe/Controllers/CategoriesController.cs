@@ -27,7 +27,7 @@ namespace WatchMe.Controllers
         public ActionResult<List<Category>> GetCategories()
         {
 
-            return _context.Categories.AsNoTracking().ToList(); // asnotracking hafızda tutmaz
+            return _context.Categories.AsNoTracking().ToList(); // asnotracking hafızada tutmaz
             //return _context.Categories.ToList();
         }
 
@@ -49,22 +49,78 @@ namespace WatchMe.Controllers
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        [Authorize(Roles = "ContentAdmin")]
-        public void PutCategory(Category category)
-        {
-            _context.Categories.Update(category);
+        //[HttpPut("{id}")]
+        ////[Authorize(Roles = "ContentAdmin")]
+        //public async Task<ActionResult> PutCategory(short? id, Category category)
+        //{
+        //    if (id == null || _context.Categories == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var existcategory =  _context.Categories.Find(id);
 
-            //_context.Entry(category).State = EntityState.Modified;
+        //    existcategory.Name = category.Name;
+
+
+        //    _context.Categories.Update(existcategory);
+        //    //_context.Entry(existcategory).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //    return NoContent();
+        //}
+
+        //[HttpPut("{id}")]
+        ////[Authorize(Roles = "ContentAdmin")]
+        //public ActionResult PutCategory(short? id, Category category)
+        //{
+        //    if (id == null || _context.Categories == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var existcategory = _context.Categories.Find(id);
+
+        //    existcategory!.Name = category.Name;
+
+
+        //    _context.Categories.Update(existcategory);
+        //    //_context.Entry(existcategory).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //         _context.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //    return NoContent();
+        //}
+
+
+        [HttpPut]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult PutCategory(Category category)
+        {
+
+            _context.Categories.Update(category);
+            //_context.Entry(existcategory).State = EntityState.Modified;
 
             try
             {
-                 _context.SaveChanges();
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
-               
+
             }
+            return NoContent();
         }
 
         // POST: api/Categories

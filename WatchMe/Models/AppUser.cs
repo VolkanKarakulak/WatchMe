@@ -22,5 +22,29 @@ public class AppUser : IdentityUser<long>
     [NotMapped]
     [StringLength(100, MinimumLength = 8)]
     public string PassWord { get; set; } = "";
+
+    [NotMapped]
+    public byte? Restriction 
+    { 
+        get
+        {
+            int age = DateTime.Today.Year - BirthDate.Year; // eksik kendin yap
+
+            if (age < 7)
+            {
+                return 7;
+            }
+            else
+            {
+                if (age < 13)
+                {
+                    return 13;
+                }
+
+            }
+
+            return null;
+        }
+    }  
 }
 

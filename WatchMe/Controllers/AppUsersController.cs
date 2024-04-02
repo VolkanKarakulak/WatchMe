@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Identity.Data;
+using WatchMe.Models;
 
 namespace WatchMe.Controllers
 {
@@ -153,11 +155,18 @@ namespace WatchMe.Controllers
             return Ok();
         }
         [HttpPost("LogIn")]
-        public ActionResult<bool> LogIn(LogInModel logInModel)
+        public ActionResult<List<Media>> LogIn(LogInModel logInModel)
         {
-            Microsoft.AspNetCore.Identity.SignInResult signInResult;
 
+
+            Microsoft.AspNetCore.Identity.SignInResult signInResult;
             AppUser applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result; // Result; async FindByNameAsync metodunun çalışmasını senkron bir şekilde çağırarak sonucunu bekler ve sonucu alır.
+            List<Media>? medias = null;
+            List<UserFavorite> userFavorites;
+            IQueryable<Media> mediaQuery;
+            IGrouping<short, MediaCategory>? mediaCategories;
+            IQueryable<int> userWatcheds;
+
 
             if (applicationUser == null)
             {
@@ -174,7 +183,59 @@ namespace WatchMe.Controllers
                 return Content("Passive");
             }
             signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
-            return signInResult.Succeeded;
+            if (signInResult.Succeeded == true)
+            {
+                //Kullanıcının favori olarak işaretlediği mediaları ve kategorilerini alıyoruz.
+                userFavorites = _context.UserFavorites.Where(u => u.UserId == applicationUser.Id).Include(u => u.Media).Include(u => u.Media!.MediaCategories).ToList();
+                //userFavorites içindeki media kategorilerini ayıklıyoruz (SelectMany)
+                //Bunları kategori id'lerine göre grupluyoruz (GroupBy)
+                //Her grupta kaç adet item olduğuna bakıp (m.Count())
+                //Çoktan aza doğru sıralıyoruz (OrderByDescending)
+                //En üstteki, yani en çok item'a sahip grubu seçiyoruz (FirstOrDefault)
+                mediaCategories = userFavorites.SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
+                if (mediaCategories != null)
+                {
+                    //Kullabıcının izlediği episode'lardan media'ya ulaşıp, sadece media id'lerini alıyoruz (Select)
+                    //Tekrar eden media id'leri eliyoruz (Distinct)
+                    userWatcheds = _context.UserWatcheds.Where(u => u.UserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
+                    //Öneri yapmak için mediaCategories.Key'i yani kullanıcının en çok favorilediği kategori id'sini kullanıyoruz
+                    //Media listesini çekerken sadece bu kategoriye ait mediaların MediaCategories listesini dolduruyoruz (Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)))
+                    //Diğer mediaların MediaCategories listeleri boş kalıyor
+                    //Sonrasında MediaCategories'i boş olmayan media'ları filtreliyoruz (m.MediaCategories!.Count > 0)
+                    //Ayrıca bu kategoriye giren fakat kullanıcının izlemiş olduklarını da dışarıda bırakıyoruz (userWatcheds.Contains(m.Id) == false)
+                    mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)).Where(m => m.MediaCategories!.Count > 0 && userWatcheds.Contains(m.Id) == false);
+                    if (applicationUser.Restriction != null)
+                    {
+                        //TO DO
+                        //Son olarak, kullanıcı bir restrictiona sahipse seçilen media içerisinden bunları da çıkarmamız gerekiyor.
+                        mediaQuery = mediaQuery.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= applicationUser.Restriction));
+                    }
+                    medias = mediaQuery.ToList();
+                }
+                //Populate medias
+            }
+            return medias;
         }
     }
 }
+
+
+// Önerilerin Uzun Yöntemi
+// userFavorites = _context.UserFavorites.Where(u => u.UserId == applicationUser.Id);
+//userFavorites = userFavorites.Include(u => u.Media);
+//userFavorites = userFavorites.Include(u => u.Media!.MediaCategories);
+//mediaCategories = userFavorites.ToList().SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
+
+//if (mediaCategories != null)
+//{
+//    userWatcheds = _context.UserWatcheds.Where(u => u.UserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
+//    mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)).Where(m => userWatcheds.Contains(m.Id) == false);
+//    if (applicationUser.Restriction != null)
+//    {
+//        mediaQuery = mediaQuery.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= applicationUser.Restriction));
+//    }
+
+//    medias = mediaQuery.ToList();
+//}
+//            }
+//            return medias;

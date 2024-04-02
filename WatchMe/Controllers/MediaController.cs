@@ -49,8 +49,6 @@ namespace WatchMe.Controllers
         [HttpPut("{id}")]
         public void PutMedia(Media media)
         {
-
-
             _context.Medias.Update(media);
 
             try
@@ -66,10 +64,17 @@ namespace WatchMe.Controllers
         // POST: api/Media
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public int PostMedia(Media media)
+        public int PostMedia(Media media, short categoryId)
         {
-          
+             MediaCategory mediaCategory = new MediaCategory();
+
             _context.Medias.Add(media);
+            _context.SaveChanges();
+            
+            mediaCategory.CategoryId = categoryId;
+            mediaCategory.MediaId = media.Id;
+
+            _context.MediaCategories.Add(mediaCategory);
             _context.SaveChanges();
 
             return media.Id;
