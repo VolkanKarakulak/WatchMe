@@ -64,17 +64,28 @@ namespace WatchMe.Controllers
         // POST: api/Media
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public int PostMedia(Media media, short categoryId)
+        public int PostMedia(Media media, int starId, short categoryId, int directorId) // Restriction ekle
         {
-             MediaCategory mediaCategory = new MediaCategory();
 
+            MediaStar mediaStar = new MediaStar();
+            MediaCategory mediaCategory = new MediaCategory();
+            MediaDirector mediaDirector = new MediaDirector();
+             //MediaRestriction mediaRestriction = new MediaRestriction();
+             
             _context.Medias.Add(media);
             _context.SaveChanges();
-            
+
+            mediaStar.StarId = starId;
+            mediaStar.MediaId = media.Id;
             mediaCategory.CategoryId = categoryId;
             mediaCategory.MediaId = media.Id;
+            mediaDirector.DirectorId = directorId;
+            mediaDirector.MediaId = media.Id;
+            //mediaRestriction.RestrictionId = restrictionId;
 
+            _context.MediaStars.Add(mediaStar);
             _context.MediaCategories.Add(mediaCategory);
+            _context.MediaDirectors.Add(mediaDirector);
             _context.SaveChanges();
 
             return media.Id;

@@ -47,7 +47,7 @@ namespace WatchMe.Controllers
             return category;
         }
 
-        // PUT: api/Categories/5
+        // PUT: api/Categories/5  // Put için id'li yöntem.
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         //[HttpPut("{id}")]
         ////[Authorize(Roles = "ContentAdmin")]
@@ -76,7 +76,7 @@ namespace WatchMe.Controllers
         //    return NoContent();
         //}
 
-        //[HttpPut("{id}")]
+        //[HttpPut("{id}")] // Put için id'Li diğer yöntem
         ////[Authorize(Roles = "ContentAdmin")]
         //public ActionResult PutCategory(short? id, Category category)
         //{
