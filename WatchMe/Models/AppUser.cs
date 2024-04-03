@@ -40,6 +40,13 @@ public class AppUser : IdentityUser<long>
                 {
                     return 13;
                 }
+                else
+                {
+                    if (age < 18)
+                    {
+                        return 18;
+                    }
+                }
 
             }
 

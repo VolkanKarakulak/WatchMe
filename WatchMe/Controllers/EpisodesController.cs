@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,7 @@ namespace WatchMe.Controllers
         public ActionResult<List<Episode>> GetEpisodes(int mediaId, byte seasonNumber)
         {
           
-            return _context.Episodes.Where(e => e.MediaId == mediaId && e.SeasonNumber == seasonNumber).OrderBy(e => e.EpisodeNumber).ToList();
+            return _context.Episodes.Where(e => e.MediaId == mediaId && e.SeasonNumber == seasonNumber).OrderBy(e => e.EpisodeNumber).AsNoTracking().ToList();
         }
 
         // GET: api/Episodes/5
@@ -43,6 +44,32 @@ namespace WatchMe.Controllers
             }
 
             return episode;
+        }
+
+        [HttpGet("Watch")]
+        [Authorize]
+        public void Watch(long id)
+        {
+            //Find logged in user.
+            //Check age
+            //If age is less than 18
+            //Get media restrictions via episode
+            //Check if the user is permitted to view the episode
+            UserWatched userWatched = new UserWatched();
+            Episode episode = _context.Episodes.Find(id)!;
+
+            try
+            {
+                userWatched.UserId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                userWatched.EpisodeId = id;
+                _context.UserWatcheds.Add(userWatched);
+                episode.ViewCount++;
+                _context.Episodes.Update(episode);
+                _context.SaveChanges();
+                //İlk izlemede artar
+            }
+            catch (Exception ex)
+            { }
         }
 
         // PUT: api/Episodes/5

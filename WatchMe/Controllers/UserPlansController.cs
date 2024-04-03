@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -84,16 +85,19 @@ namespace WatchMe.Controllers
         // POST: api/UserPlans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserPlan>> PostUserPlan(UserPlan userPlan)
+        public void PostUserPlan(string eMail, short planId)
         {
-          if (_context.UserPlans == null)
-          {
-              return Problem("Entity set 'WatchMeContext.UserPlans'  is null.");
-          }
-            _context.UserPlans.Add(userPlan);
-            await _context.SaveChangesAsync();
+            Plan plan = _context.Plans.Find(planId)!;
+            //Get payment for plan.Price;
+            //if(payment succesful)
+            {
+                UserPlan userPlan = new UserPlan();
 
-            return CreatedAtAction("GetUserPlan", new { id = userPlan.Id }, userPlan);
+                //userPlan.UserId=Find from UserManager with EMail
+                userPlan.PlanId = planId;
+                _context.UserPlans.Add(userPlan);
+
+            }
         }
 
         // DELETE: api/UserPlans/5
