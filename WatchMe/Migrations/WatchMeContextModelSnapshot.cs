@@ -501,10 +501,7 @@ namespace WatchMe.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserdId")
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -696,7 +693,9 @@ namespace WatchMe.Migrations
 
                     b.HasOne("WatchMe.Identity.Data.AppUser", "AppUser")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AppUser");
 

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WatchMe.Migrations
 {
-    public partial class Identity : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -253,7 +253,9 @@ namespace WatchMe.Migrations
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Duration = table.Column<TimeSpan>(type: "time", nullable: false)
+                    Duration = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Passive = table.Column<bool>(type: "bit", nullable: false),
+                    ViewCount = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -344,11 +346,10 @@ namespace WatchMe.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserdId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
                     PlanId = table.Column<short>(type: "smallint", nullable: false),
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "date", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: true)
+                    EndDate = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -357,7 +358,8 @@ namespace WatchMe.Migrations
                         name: "FK_UserPlans_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserPlans_Plans_PlanId",
                         column: x => x.PlanId,
@@ -478,9 +480,10 @@ namespace WatchMe.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Episodes_MediaId",
+                name: "IX_Episodes_MediaId_SeasonNumber_EpisodeNumber",
                 table: "Episodes",
-                column: "MediaId");
+                columns: new[] { "MediaId", "SeasonNumber", "EpisodeNumber" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MediaCategories_CategoryId",

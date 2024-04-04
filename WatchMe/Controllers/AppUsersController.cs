@@ -172,7 +172,7 @@ namespace WatchMe.Controllers
             {
                 return NotFound();
             }
-            if (_context.UserPlans.Where(u => u.UserdId == applicationUser.Id && u.EndDate>= DateTime.Today).Any() == false) 
+            if (_context.UserPlans.Where(u => u.UserId == applicationUser.Id && u.EndDate>= DateTime.Today).Any() == false) 
             {
                 applicationUser.Passive = true;
                 _signInManager.UserManager.UpdateAsync(applicationUser).Wait();

@@ -12,8 +12,8 @@ using WatchMe.Data;
 namespace WatchMe.Migrations
 {
     [DbContext(typeof(WatchMeContext))]
-    [Migration("20240327112914_Identity")]
-    partial class Identity
+    [Migration("20240404083533_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -297,6 +297,9 @@ namespace WatchMe.Migrations
                     b.Property<int>("MediaId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Passive")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
@@ -308,9 +311,13 @@ namespace WatchMe.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<long>("ViewCount")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("MediaId");
+                    b.HasIndex("MediaId", "SeasonNumber", "EpisodeNumber")
+                        .IsUnique();
 
                     b.ToTable("Episodes");
                 });
@@ -496,10 +503,7 @@ namespace WatchMe.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserdId")
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -691,7 +695,9 @@ namespace WatchMe.Migrations
 
                     b.HasOne("WatchMe.Identity.Data.AppUser", "AppUser")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AppUser");
 

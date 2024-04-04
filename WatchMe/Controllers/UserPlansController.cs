@@ -4,9 +4,11 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
+using WatchMe.Identity.Data;
 using WatchMe.Models;
 
 namespace WatchMe.Controllers
@@ -16,10 +18,12 @@ namespace WatchMe.Controllers
     public class UserPlansController : ControllerBase
     {
         private readonly WatchMeContext _context;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public UserPlansController(WatchMeContext context)
+        public UserPlansController(WatchMeContext context, SignInManager<AppUser> signInManager)
         {
             _context = context;
+            _signInManager = signInManager;
         }
 
         // GET: api/UserPlans
@@ -87,17 +91,22 @@ namespace WatchMe.Controllers
         [HttpPost]
         public void PostUserPlan(string eMail, short planId)
         {
-            Plan plan = _context.Plans.Find(planId)!;
+           
+            AppUser appuser = _signInManager.UserManager.FindByEmailAsync(eMail).Result;
             //Get payment for plan.Price;
             //if(payment succesful)
-            {
-                UserPlan userPlan = new UserPlan();
+            
+            UserPlan userPlan = new UserPlan();
 
-                //userPlan.UserId=Find from UserManager with EMail
-                userPlan.PlanId = planId;
-                _context.UserPlans.Add(userPlan);
-
-            }
+            //userPlan.UserId=Find from UserManager with EMail
+                
+            userPlan.PlanId = planId;
+            userPlan.UserId = appuser.Id;
+            userPlan.StartDate = DateTime.Today;
+            userPlan.EndDate = userPlan.StartDate.AddMonths(1);
+            _context.UserPlans.Add(userPlan);
+            _context.SaveChanges();
+            
         }
 
         // DELETE: api/UserPlans/5

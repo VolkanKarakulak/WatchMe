@@ -7,7 +7,7 @@ namespace WatchMe.Models
     {
         public long Id { get; set; }
 
-        public long UserdId { get; set; }
+        public long UserId { get; set; }
 
         public short PlanId { get; set; }
 
