@@ -40,8 +40,6 @@ namespace WatchMe.Controllers
             Category? category = _context.Categories.Find(id);
             List<MediaCategory> mediaCategory = _context.MediaCategories.Where(x => x.CategoryId == id).Include(x => x.Media).ToList();
 
-           
-
             return mediaCategory;
         }
 
@@ -103,7 +101,7 @@ namespace WatchMe.Controllers
 
 
         [HttpPut]
-        [Authorize(Roles = "ContentAdmin")]
+        //[Authorize(Roles = "ContentAdmin")]
         public ActionResult PutCategory(Category category)
         {
 

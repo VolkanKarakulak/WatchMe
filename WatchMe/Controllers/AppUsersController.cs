@@ -170,16 +170,16 @@ namespace WatchMe.Controllers
             {
                 return NotFound();
             }
-            if (_context.UserPlans.Where(u => u.UserId == applicationUser.Id && u.EndDate>= DateTime.Today).Any() == false) 
-            {
-                applicationUser.Passive = true;
-                _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
+            //if (_context.UserPlans.Where(u => u.UserId == applicationUser.Id && u.EndDate>= DateTime.Today).Any() == false) 
+            //{
+            //    applicationUser.Passive = true;
+            //    _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
 
-            }
-            if (applicationUser.Passive == true)
-            {
-                return Content("Passive");
-            }
+            //}
+            //if (applicationUser.Passive == true)
+            //{
+            //    return Content("Passive");
+            //}
             signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
             if (signInResult.Succeeded == true)
             {

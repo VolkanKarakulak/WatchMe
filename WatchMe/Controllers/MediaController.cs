@@ -26,7 +26,9 @@ namespace WatchMe.Controllers
         public ActionResult<List<Media>> GetMedias()
         {
          
-            return _context.Medias.AsNoTracking().ToList();
+            return _context.Medias.Include(x => x.MediaCategories)!.ThenInclude(x=> x.Category).AsNoTracking().ToList();
+
+
         }
 
         // GET: api/Media/5
@@ -35,6 +37,8 @@ namespace WatchMe.Controllers
         {
          
             Media? media = _context.Medias.Find(id);
+
+            MediaCategory? mediacategory = _context.MediaCategories.Where(u => u.MediaId == id).Include(u => u.Category).FirstOrDefault();
 
             if (media == null)
             {
@@ -47,8 +51,13 @@ namespace WatchMe.Controllers
         // PUT: api/Media/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public void PutMedia(Media media)
+        public ActionResult PutMedia(int id, Media media)
         {
+            if (id != media.Id)
+            {
+                return BadRequest();
+            }
+
             _context.Medias.Update(media);
 
             try
@@ -59,6 +68,7 @@ namespace WatchMe.Controllers
             {
 
             }
+            return Ok();
         }
 
         // POST: api/Media

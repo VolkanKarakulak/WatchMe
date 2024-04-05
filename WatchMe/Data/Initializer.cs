@@ -27,9 +27,9 @@ namespace WatchMe.Data
                     {
                         appRole = new AppRole("Admin");
                         roleManager.CreateAsync(appRole).Wait();
-                        appRole = new AppRole("BrandAdmin");
+                        appRole = new AppRole("CustomerRepsentative");
                         roleManager.CreateAsync(appRole).Wait();
-                        appRole = new AppRole("RestaurantAdmin");
+                        appRole = new AppRole("ContentAdmin");
                         roleManager.CreateAsync(appRole).Wait();
                     }
                 }
