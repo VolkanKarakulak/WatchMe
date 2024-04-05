@@ -16,7 +16,7 @@ namespace WatchMe
             builder.Services.AddDbContext<WatchMeContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("WatchMeContext") ?? throw new InvalidOperationException("Connection string 'WatchMeContext' not found.")));
 
-            builder.Services.AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = true).AddDefaultTokenProviders()
+            builder.Services.AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = false).AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<WatchMeContext>();
 
             // Add services to the container.
