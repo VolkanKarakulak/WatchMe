@@ -157,8 +157,6 @@ namespace WatchMe.Controllers
         [HttpPost("LogIn")]
         public ActionResult<List<Media>> LogIn(LogInModel logInModel)
         {
-
-
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
             AppUser applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result; // Result; async FindByNameAsync metodunun çalışmasını senkron bir şekilde çağırarak sonucunu bekler ve sonucu alır.
             List<Media>? medias = null;

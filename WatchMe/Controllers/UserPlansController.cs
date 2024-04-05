@@ -49,7 +49,7 @@ namespace WatchMe.Controllers
 
             if (userPlan == null)
             {
-                return NotFound();
+                return NotFound("Kayıt Bulunamadı");
             }
 
             return userPlan;
@@ -57,34 +57,27 @@ namespace WatchMe.Controllers
 
         // PUT: api/UserPlans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUserPlan(long id, UserPlan userPlan)
-        {
-            if (id != userPlan.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutUserPlan(long id, UserPlan userPlan)
+        //{
+        //    if (id != userPlan.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(userPlan).State = EntityState.Modified;
+        //    _context.Entry(userPlan).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserPlanExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+               
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/UserPlans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -110,28 +103,28 @@ namespace WatchMe.Controllers
         }
 
         // DELETE: api/UserPlans/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserPlan(long id)
-        {
-            if (_context.UserPlans == null)
-            {
-                return NotFound();
-            }
-            var userPlan = await _context.UserPlans.FindAsync(id);
-            if (userPlan == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUserPlan(long id)
+        //{
+        //    if (_context.UserPlans == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var userPlan = await _context.UserPlans.FindAsync(id);
+        //    if (userPlan == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.UserPlans.Remove(userPlan);
-            await _context.SaveChangesAsync();
+        //    _context.UserPlans.Remove(userPlan);
+        //    await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
-        private bool UserPlanExists(long id)
-        {
-            return (_context.UserPlans?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool UserPlanExists(long id)
+        //{
+        //    return (_context.UserPlans?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
     }
 }

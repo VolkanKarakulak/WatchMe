@@ -9,7 +9,7 @@ using WatchMe.Models;
 
 namespace WatchMe.Data
 {
-    public class WatchMeContext : IdentityDbContext<AppUser, AppUserRole, long>
+    public class WatchMeContext : IdentityDbContext<AppUser, AppRole, long>
     {
         public WatchMeContext(DbContextOptions<WatchMeContext> options)
             : base(options)

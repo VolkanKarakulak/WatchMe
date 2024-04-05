@@ -33,18 +33,16 @@ namespace WatchMe.Controllers
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-        [Authorize]
-        public ActionResult<Category> GetCategory(short id)
+       //[Authorize]
+        public ActionResult<List<MediaCategory>> GetCategory(short id)
         {
          
             Category? category = _context.Categories.Find(id);
+            List<MediaCategory> mediaCategory = _context.MediaCategories.Where(x => x.CategoryId == id).Include(x => x.Media).ToList();
 
-            if (category == null)
-            {
-                return NotFound();
-            }
+           
 
-            return category;
+            return mediaCategory;
         }
 
         // PUT: api/Categories/5  // Put için id'li yöntem.
