@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace WatchMe.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(Roles = "ContentAdmin")]
     public class RestrictionsController : ControllerBase
     {
         private readonly WatchMeContext _context;
@@ -23,24 +25,24 @@ namespace WatchMe.Controllers
 
         // GET: api/Restrictions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Restriction>>> GetRestrictions()
+        public ActionResult<IEnumerable<Restriction>> GetRestrictions()
         {
           if (_context.Restrictions == null)
           {
               return NotFound();
           }
-            return await _context.Restrictions.ToListAsync();
+            return _context.Restrictions.ToList();
         }
 
         // GET: api/Restrictions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Restriction>> GetRestriction(byte id)
+        public ActionResult<Restriction> GetRestriction(byte id)
         {
-          if (_context.Restrictions == null)
-          {
-              return NotFound();
-          }
-            var restriction = await _context.Restrictions.FindAsync(id);
+            if (_context.Restrictions == null)
+            {
+                return NotFound();
+            }
+            Restriction? restriction = _context.Restrictions.Find(id);
 
             if (restriction == null)
             {
@@ -53,7 +55,7 @@ namespace WatchMe.Controllers
         // PUT: api/Restrictions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRestriction(byte id, Restriction restriction)
+        public IActionResult PutRestriction(byte id, Restriction restriction)
         {
             if (id != restriction.Id)
             {
@@ -64,7 +66,7 @@ namespace WatchMe.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                 _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,7 +86,7 @@ namespace WatchMe.Controllers
         // POST: api/Restrictions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Restriction>> PostRestriction(Restriction restriction)
+        public ActionResult<Restriction> PostRestriction(Restriction restriction)
         {
           if (_context.Restrictions == null)
           {
@@ -93,7 +95,7 @@ namespace WatchMe.Controllers
             _context.Restrictions.Add(restriction);
             try
             {
-                await _context.SaveChangesAsync();
+                 _context.SaveChanges();
             }
             catch (DbUpdateException)
             {
@@ -112,24 +114,34 @@ namespace WatchMe.Controllers
 
         // DELETE: api/Restrictions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRestriction(byte id)
+        public IActionResult DeleteRestriction(byte id)
         {
             if (_context.Restrictions == null)
             {
                 return NotFound();
             }
-            var restriction = await _context.Restrictions.FindAsync(id);
+            var restriction = _context.Restrictions.Find(id);
             if (restriction == null)
             {
                 return NotFound();
             }
 
             _context.Restrictions.Remove(restriction);
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
 
             return NoContent();
         }
-
+        [HttpGet("restriction_id")]
+        [Authorize]
+        public ActionResult<List<MediaRestriction>> Restriction_Medias(byte restrictionId)
+        {
+            List<MediaRestriction> mediaRestriction = _context.MediaRestrictions.Where(m => m.RestrictionId == restrictionId).ToList();
+            if (mediaRestriction == null)
+            {
+                return NotFound();
+            }
+            return mediaRestriction;
+        }
         private bool RestrictionExists(byte id)
         {
             return (_context.Restrictions?.Any(e => e.Id == id)).GetValueOrDefault();

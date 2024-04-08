@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
 
 namespace WatchMe.Controllers
 {
@@ -23,7 +24,7 @@ namespace WatchMe.Controllers
 
         // GET: api/Directors
         [HttpGet]
-        public ActionResult<IEnumerable<Director>> GetDirectors()
+        public ActionResult<List<Director>> GetDirectors()
         {
           if (_context.Directors == null)
           {
@@ -34,21 +35,27 @@ namespace WatchMe.Controllers
 
         // GET: api/Directors/5
         [HttpGet("{id}")]
-        public ActionResult<List<MediaDirector>> GetDirector(int id)
+        public ActionResult<List<MediaInfoViewModel>> GetDirectorMedia(int id)
         {
-          if (_context.Directors == null)
-          {
-              return NotFound();
-          }
-            List<MediaDirector> mediaDirector = _context.MediaDirectors.Where(d => d.DirectorId ==id).Include(n => n.Media).ToList();
+            var directorMedia = _context.MediaDirectors
+                .Where(md => md.DirectorId == id)
+                .Include(md => md.Media)            
+                .ToList();
 
-            if (mediaDirector == null)
+            if (directorMedia == null)
             {
                 return NotFound();
             }
 
-            return mediaDirector;
+            var mediaInfoList = directorMedia.Select(md => new MediaInfoViewModel
+            {
+                MediaName = md.Media?.Name,               
+                IsPassive = md.Media?.Passive
+            }).ToList();
+
+            return mediaInfoList;
         }
+
 
         // PUT: api/Directors/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -85,20 +92,20 @@ namespace WatchMe.Controllers
 
         // DELETE: api/Directors/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDirector(int id)
+        public ActionResult DeleteDirector(int id)
         {
             if (_context.Directors == null)
             {
                 return NotFound();
             }
-            var director = await _context.Directors.FindAsync(id);
+            Director? director =  _context.Directors.Find(id);
             if (director == null)
             {
                 return NotFound();
             }
 
             _context.Directors.Remove(director);
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
 
             return NoContent();
         }

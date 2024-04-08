@@ -12,7 +12,7 @@ using WatchMe.Data;
 namespace WatchMe.Migrations
 {
     [DbContext(typeof(WatchMeContext))]
-    [Migration("20240404083533_Initial")]
+    [Migration("20240408133656_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,12 +75,10 @@ namespace WatchMe.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -116,12 +114,10 @@ namespace WatchMe.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -210,7 +206,7 @@ namespace WatchMe.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WatchMe.Models.AppUserRole", b =>
+            modelBuilder.Entity("WatchMe.Models.AppRole", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -385,15 +381,12 @@ namespace WatchMe.Migrations
                     b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RestrictionId")
-                        .HasColumnType("int");
-
-                    b.Property<byte?>("Restrictiond")
+                    b.Property<byte>("RestrictionId")
                         .HasColumnType("tinyint");
 
                     b.HasKey("MediaId", "RestrictionId");
 
-                    b.HasIndex("Restrictiond");
+                    b.HasIndex("RestrictionId");
 
                     b.ToTable("MediaRestrictions");
                 });
@@ -532,7 +525,7 @@ namespace WatchMe.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
-                    b.HasOne("WatchMe.Models.AppUserRole", null)
+                    b.HasOne("WatchMe.Models.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -559,7 +552,7 @@ namespace WatchMe.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<long>", b =>
                 {
-                    b.HasOne("WatchMe.Models.AppUserRole", null)
+                    b.HasOne("WatchMe.Models.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -640,7 +633,9 @@ namespace WatchMe.Migrations
 
                     b.HasOne("WatchMe.Models.Restriction", "Restrictions")
                         .WithMany()
-                        .HasForeignKey("Restrictiond");
+                        .HasForeignKey("RestrictionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Media");
 

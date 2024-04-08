@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
 
 namespace WatchMe.Controllers
 {
@@ -23,37 +24,49 @@ namespace WatchMe.Controllers
 
         // GET: api/Plans
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Plan>>> GetPlans()
+        public ActionResult<List<PlanViewModel>> GetPlans()
         {
-          if (_context.Plans == null)
-          {
-              return NotFound();
-          }
-            return await _context.Plans.ToListAsync();
+            if (_context.Plans == null)
+            {
+                return NotFound();
+            }
+
+            var plans = _context.Plans.Select(p => new PlanViewModel
+            {
+                Name = p.Name,
+                Price = p.Price,
+                Resolution = p.Resolution
+            }).ToList();
+
+            return Ok(plans);
         }
+
 
         // GET: api/Plans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Plan>> GetPlan(short id)
+        public ActionResult<PlanViewModel> GetPlan(short id)
         {
-          if (_context.Plans == null)
-          {
-              return NotFound();
-          }
-            var plan = await _context.Plans.FindAsync(id);
+            Plan? plan = _context.Plans.Find(id);
 
             if (plan == null)
             {
                 return NotFound();
             }
 
-            return plan;
+            var planViewModel = new PlanViewModel
+            {
+                Name = plan.Name,
+                Price = plan.Price,
+                Resolution = plan.Resolution
+            };
+
+            return Ok(planViewModel);
         }
 
         // PUT: api/Plans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlan(short id, Plan plan)
+        public IActionResult PutPlan(short id, Plan plan)
         {
             if (id != plan.Id)
             {
@@ -64,7 +77,7 @@ namespace WatchMe.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,34 +97,34 @@ namespace WatchMe.Controllers
         // POST: api/Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Plan>> PostPlan(Plan plan)
+        public ActionResult<Plan> PostPlan(Plan plan)
         {
           if (_context.Plans == null)
           {
               return Problem("Entity set 'WatchMeContext.Plans'  is null.");
           }
             _context.Plans.Add(plan);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return CreatedAtAction("GetPlan", new { id = plan.Id }, plan);
         }
 
         // DELETE: api/Plans/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlan(short id)
+        public ActionResult DeletePlan(short id)
         {
             if (_context.Plans == null)
             {
                 return NotFound();
             }
-            var plan = await _context.Plans.FindAsync(id);
+            var plan = _context.Plans.Find(id);
             if (plan == null)
             {
                 return NotFound();
             }
 
             _context.Plans.Remove(plan);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return NoContent();
         }

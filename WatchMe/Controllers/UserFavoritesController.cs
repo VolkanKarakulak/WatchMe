@@ -61,8 +61,8 @@ namespace WatchMe.Controllers
 
 
         // GET: api/UserFavorites/5
-        [HttpGet("{WitheMail}")]
-        public async Task<ActionResult<IEnumerable<UserFavorite>>> GetUserFavorites(string eMail)
+        [HttpGet("{eMail}")]
+        public async Task<ActionResult<List<UserFavorite>>> GetUserFavorites(string eMail)
         {
             // Kullanıcıyı bul
             var appUser = await _signInManager.UserManager.FindByEmailAsync(eMail);

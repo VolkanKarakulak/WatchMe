@@ -24,27 +24,27 @@ namespace WatchMe.Data
                 if (!context.Restrictions.Any())
                 {
                     restriction = new Restriction();
-                    restriction.Name = "Genel Izleyici";
+                    restriction.Name = "Genel İzleyici";
                     restriction.Id = 0;
                     context.Restrictions.Add(restriction);
                     restriction = new Restriction();
-                    restriction.Name = "7";
+                    restriction.Name = "7 Yaş ve Üzeri";
                     restriction.Id = 7;
                     context.Restrictions.Add(restriction);
                     restriction = new Restriction();
-                    restriction.Name = "13";
+                    restriction.Name = "13 Yaş ve Üzeri";
                     restriction.Id = 13;
                     context.Restrictions.Add(restriction);
                     restriction = new Restriction();
-                    restriction.Name = "18";
+                    restriction.Name = "18 Yaş ve Üzeri";
                     restriction.Id = 18;
                     context.Restrictions.Add(restriction);
                     restriction = new Restriction();
-                    restriction.Name = "Korku ve Şiddet";
+                    restriction.Name = "Şiddet/Korku";
                     restriction.Id = 19;
                     context.Restrictions.Add(restriction);
                     restriction = new Restriction();
-                    restriction.Name = "Olumsuz Örnek";
+                    restriction.Name = "Olumsuz Örnek Oluşturabilecek Davranışlar";
                     restriction.Id = 20;
                     context.Restrictions.Add(restriction);
                     restriction = new Restriction();

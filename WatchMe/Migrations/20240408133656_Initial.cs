@@ -181,8 +181,8 @@ namespace WatchMe.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<long>(type: "bigint", nullable: false)
                 },
@@ -226,8 +226,8 @@ namespace WatchMe.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -373,8 +373,7 @@ namespace WatchMe.Migrations
                 columns: table => new
                 {
                     MediaId = table.Column<int>(type: "int", nullable: false),
-                    RestrictionId = table.Column<int>(type: "int", nullable: false),
-                    Restrictiond = table.Column<byte>(type: "tinyint", nullable: true)
+                    RestrictionId = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -386,10 +385,11 @@ namespace WatchMe.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MediaRestrictions_Restrictions_Restrictiond",
-                        column: x => x.Restrictiond,
+                        name: "FK_MediaRestrictions_Restrictions_RestrictionId",
+                        column: x => x.RestrictionId,
                         principalTable: "Restrictions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -496,9 +496,9 @@ namespace WatchMe.Migrations
                 column: "DirectorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaRestrictions_Restrictiond",
+                name: "IX_MediaRestrictions_RestrictionId",
                 table: "MediaRestrictions",
-                column: "Restrictiond");
+                column: "RestrictionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MediaStars_StarId",

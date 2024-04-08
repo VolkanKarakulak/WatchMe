@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
 
 namespace WatchMe.Controllers
 {
@@ -23,24 +25,21 @@ namespace WatchMe.Controllers
 
         // GET: api/Stars
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Star>>> GetStars()
+        public ActionResult<List<Star>> GetStars()
         {
           if (_context.Stars == null)
           {
               return NotFound();
           }
-            return await _context.Stars.ToListAsync();
+            return _context.Stars.ToList();
         }
 
         // GET: api/Stars/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Star>> GetStar(int id)
+        public ActionResult<Star> GetStar(int id)
         {
-          if (_context.Stars == null)
-          {
-              return NotFound();
-          }
-            var star = await _context.Stars.FindAsync(id);
+          
+            Star? star = _context.Stars.Find(id);
 
             if (star == null)
             {
@@ -50,10 +49,33 @@ namespace WatchMe.Controllers
             return star;
         }
 
+        [HttpGet("mediastars/{starId}")]
+        //[Authorize]
+        public ActionResult<List<MediaStarViewModel>> GetMediaStar(int starId)
+        {
+            List<MediaStarViewModel> mediaStars = _context.MediaStars
+            .Where(ms => ms.StarId == starId)
+            .Select(ms => new MediaStarViewModel
+            {
+            MediaName = ms.Media!.Name,
+            StarName = ms.Star!.Name
+            })
+            .ToList();
+
+
+            if (mediaStars == null)
+            {
+                return NotFound();
+            }
+
+            return mediaStars;
+        }
+
+
         // PUT: api/Stars/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStar(int id, Star star)
+        public ActionResult PutStar(int id, Star star)
         {
             if (id != star.Id)
             {
@@ -64,7 +86,7 @@ namespace WatchMe.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                 _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,34 +106,34 @@ namespace WatchMe.Controllers
         // POST: api/Stars
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Star>> PostStar(Star star)
+        public ActionResult<Star> PostStar(Star star)
         {
           if (_context.Stars == null)
           {
               return Problem("Entity set 'WatchMeContext.Stars'  is null.");
           }
             _context.Stars.Add(star);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return CreatedAtAction("GetStar", new { id = star.Id }, star);
         }
 
         // DELETE: api/Stars/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStar(int id)
+        public ActionResult DeleteStar(int id)
         {
             if (_context.Stars == null)
             {
                 return NotFound();
             }
-            var star = await _context.Stars.FindAsync(id);
+            Star? star =  _context.Stars.Find(id);
             if (star == null)
             {
                 return NotFound();
             }
 
             _context.Stars.Remove(star);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return NoContent();
         }

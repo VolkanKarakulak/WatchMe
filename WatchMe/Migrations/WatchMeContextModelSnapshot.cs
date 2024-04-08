@@ -379,15 +379,12 @@ namespace WatchMe.Migrations
                     b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RestrictionId")
-                        .HasColumnType("int");
-
-                    b.Property<byte?>("Restrictiond")
+                    b.Property<byte>("RestrictionId")
                         .HasColumnType("tinyint");
 
                     b.HasKey("MediaId", "RestrictionId");
 
-                    b.HasIndex("Restrictiond");
+                    b.HasIndex("RestrictionId");
 
                     b.ToTable("MediaRestrictions");
                 });
@@ -634,7 +631,9 @@ namespace WatchMe.Migrations
 
                     b.HasOne("WatchMe.Models.Restriction", "Restrictions")
                         .WithMany()
-                        .HasForeignKey("Restrictiond");
+                        .HasForeignKey("RestrictionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Media");
 

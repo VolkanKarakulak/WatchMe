@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
 
 namespace WatchMe.Controllers
 {
@@ -25,25 +26,25 @@ namespace WatchMe.Controllers
 
         // GET: api/Episodes
         [HttpGet]
-        public ActionResult<List<Episode>> GetEpisodes(int mediaId, byte seasonNumber)
+        public ActionResult<List<EpisodeViewModel>> GetEpisodes(int mediaId, byte seasonNumber)
         {
-          
-            return _context.Episodes.Where(e => e.MediaId == mediaId && e.SeasonNumber == seasonNumber).OrderBy(e => e.EpisodeNumber).AsNoTracking().ToList();
-        }
+            var episodes = _context.Episodes
+                .Where(e => e.MediaId == mediaId && e.SeasonNumber == seasonNumber)
+                .OrderBy(e => e.EpisodeNumber)
+                .Select(e => new EpisodeViewModel
+                {
+                    MediaName = e.Media!.Name, 
+                    SeasonNumber = e.SeasonNumber,
+                    EpisodeNumber = e.EpisodeNumber,
+                    Title = e.Title,
+                    ReleaseDate = e.ReleaseDate,
+                    Description = e.Description,
+                    Passive = e.Passive,
+                    ViewCount = e.ViewCount
+                })
+                .ToList();
 
-        // GET: api/Episodes/5
-        [HttpGet("{id}")]
-        //[Authorize]
-        public ActionResult<Episode> GetEpisode(long id)
-        {
-            Episode? episode = _context.Episodes.Find(id);
-
-            if (episode == null)
-            {
-                return NotFound();
-            }
-
-            return episode;
+            return episodes;
         }
 
         [HttpGet("Watch")]
