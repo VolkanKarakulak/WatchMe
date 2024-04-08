@@ -39,13 +39,9 @@ namespace WatchMe.Controllers
 
         // GET: api/UserPlans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserPlan>> GetUserPlan(long id)
+        public ActionResult<List<UserPlan>> GetUserPlan(long id)
         {
-          if (_context.UserPlans == null)
-          {
-              return NotFound();
-          }
-            var userPlan = await _context.UserPlans.FindAsync(id);
+            List<UserPlan> userPlan = _context.UserPlans.Where(u => u.UserId == id).ToList();
 
             if (userPlan == null)
             {
@@ -55,76 +51,32 @@ namespace WatchMe.Controllers
             return userPlan;
         }
 
-        // PUT: api/UserPlans/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutUserPlan(long id, UserPlan userPlan)
-        //{
-        //    if (id != userPlan.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(userPlan).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-               
-        //    }
-
-        //    return NoContent();
-        //}
 
         // POST: api/UserPlans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public void PostUserPlan(string eMail, short planId)
+        public async Task<IActionResult> PostUserPlan(string eMail, short planId)
         {
            
-            AppUser appuser = _signInManager.UserManager.FindByEmailAsync(eMail).Result;
+            AppUser appUser = _signInManager.UserManager.FindByEmailAsync(eMail).Result;
             //Get payment for plan.Price;
             //if(payment succesful)
-            
-            UserPlan userPlan = new UserPlan();
+            if (appUser == null)
+            {
+                return NotFound("Kullanıcı Bulunamadı.");
+            }
 
-            //userPlan.UserId=Find from UserManager with EMail
-                
+            UserPlan userPlan = new UserPlan();                                 
             userPlan.PlanId = planId;
-            userPlan.UserId = appuser.Id;
+            userPlan.UserId = appUser.Id;
             userPlan.StartDate = DateTime.Today;
             userPlan.EndDate = userPlan.StartDate.AddMonths(1);
             _context.UserPlans.Add(userPlan);
-            _context.SaveChanges();
-            
+            appUser.Passive = false;
+            await _context.SaveChangesAsync();
+
+            return Ok("Plan Oluşturuldu");
         }
 
-        // DELETE: api/UserPlans/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteUserPlan(long id)
-        //{
-        //    if (_context.UserPlans == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var userPlan = await _context.UserPlans.FindAsync(id);
-        //    if (userPlan == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.UserPlans.Remove(userPlan);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
-
-        //private bool UserPlanExists(long id)
-        //{
-        //    return (_context.UserPlans?.Any(e => e.Id == id)).GetValueOrDefault();
-        //}
     }
 }

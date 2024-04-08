@@ -7,8 +7,10 @@ namespace WatchMe.Models
     {
         public long UserId { get; set; }
         public int MediaId { get; set; }
+
         [ForeignKey("UserId")]
         public AppUser? AppUser { get; set; }
+
         [ForeignKey("MediaId")]
         public Media? Media { get; set; }
     }

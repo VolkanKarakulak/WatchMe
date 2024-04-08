@@ -15,11 +15,44 @@ namespace WatchMe.Data
            
             AppRole appRole;
             AppUser appUser;
-            //Brand? brand = null;
+            Restriction restriction;
 
             if (context != null)
             {
+                context.Database.Migrate();
 
+                if (!context.Restrictions.Any())
+                {
+                    restriction = new Restriction();
+                    restriction.Name = "Genel Izleyici";
+                    restriction.Id = 0;
+                    context.Restrictions.Add(restriction);
+                    restriction = new Restriction();
+                    restriction.Name = "7";
+                    restriction.Id = 7;
+                    context.Restrictions.Add(restriction);
+                    restriction = new Restriction();
+                    restriction.Name = "13";
+                    restriction.Id = 13;
+                    context.Restrictions.Add(restriction);
+                    restriction = new Restriction();
+                    restriction.Name = "18";
+                    restriction.Id = 18;
+                    context.Restrictions.Add(restriction);
+                    restriction = new Restriction();
+                    restriction.Name = "Korku ve Şiddet";
+                    restriction.Id = 19;
+                    context.Restrictions.Add(restriction);
+                    restriction = new Restriction();
+                    restriction.Name = "Olumsuz Örnek";
+                    restriction.Id = 20;
+                    context.Restrictions.Add(restriction);
+                    restriction = new Restriction();
+                    restriction.Name = "Cinsellik";
+                    restriction.Id = 21;
+                    context.Restrictions.Add(restriction);
+
+                }
                 context.SaveChanges();
                 if (roleManager != null)
                 {
@@ -27,9 +60,9 @@ namespace WatchMe.Data
                     {
                         appRole = new AppRole("Admin");
                         roleManager.CreateAsync(appRole).Wait();
-                        appRole = new AppRole("CustomerRepsentative");
-                        roleManager.CreateAsync(appRole).Wait();
                         appRole = new AppRole("ContentAdmin");
+                        roleManager.CreateAsync(appRole).Wait();
+                        appRole = new AppRole("CustomerRepsentative");
                         roleManager.CreateAsync(appRole).Wait();
                     }
                 }
@@ -69,6 +102,7 @@ namespace WatchMe.Data
 
                     }
                 }
+
             }
         }
     }

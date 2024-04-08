@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
 
 namespace WatchMe.Controllers
 {
@@ -25,26 +26,23 @@ namespace WatchMe.Controllers
         [HttpGet]
         public ActionResult<List<Media>> GetMedias()
         {
-         
             return _context.Medias.Include(x => x.MediaCategories)!.ThenInclude(x=> x.Category).AsNoTracking().ToList();
-
-
         }
 
         // GET: api/Media/5
         [HttpGet("{id}")]
         public ActionResult<Media> GetMedia(int id)
         {
-         
             Media? media = _context.Medias.Find(id);
 
-            MediaCategory? mediacategory = _context.MediaCategories.Where(u => u.MediaId == id).Include(u => u.Category).FirstOrDefault();
-
+            List<MediaCategory>? mediaCategory = _context.MediaCategories.Where(u => u.MediaId == id).Include(u => u.Category).ToList();
+            List<MediaDirector>? mediaDirector = _context.MediaDirectors.Where( d => d.MediaId == id).Include(d => d.Directors).ToList();
+            List<MediaStar>? mediaStar = _context.MediaStars.Where( d => d.MediaId == id).Include(d => d.Star).ToList();
+           
             if (media == null)
             {
                 return NotFound();
             }
-
             return media;
         }
 
@@ -74,32 +72,59 @@ namespace WatchMe.Controllers
         // POST: api/Media
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public int PostMedia(Media media, int starId, short categoryId, int directorId) // Restriction ekle
+        public int PostMedia(MediaViewModel MViewModel)
         {
-
-            MediaStar mediaStar = new MediaStar();
-            MediaCategory mediaCategory = new MediaCategory();
-            MediaDirector mediaDirector = new MediaDirector();
-             //MediaRestriction mediaRestriction = new MediaRestriction();
-             
-            _context.Medias.Add(media);
+            // Medya bilgisini ekleyin
+            _context.Medias.Add(MViewModel.Media!);
             _context.SaveChanges();
 
-            mediaStar.StarId = starId;
-            mediaStar.MediaId = media.Id;
-            mediaCategory.CategoryId = categoryId;
-            mediaCategory.MediaId = media.Id;
-            mediaDirector.DirectorId = directorId;
-            mediaDirector.MediaId = media.Id;
-            //mediaRestriction.RestrictionId = restrictionId;
+            // Yıldızları ekleyin
+            if (MViewModel.StarIds != null)
+            {
+                foreach (int starId in MViewModel.StarIds)
+                {
+                    MediaStar mediaStar = new MediaStar
+                    {
+                        StarId = starId,
+                        MediaId = MViewModel.Media!.Id
+                    };
+                    _context.MediaStars.Add(mediaStar);
+                }
+            }
 
-            _context.MediaStars.Add(mediaStar);
-            _context.MediaCategories.Add(mediaCategory);
-            _context.MediaDirectors.Add(mediaDirector);
+            // Kategorileri ekleyin
+            if (MViewModel.CategoryIds != null)
+            {
+                foreach (short categoryId in MViewModel.CategoryIds)
+                {
+                    MediaCategory mediaCategory = new MediaCategory
+                    {
+                        CategoryId = categoryId,
+                        MediaId = MViewModel.Media!.Id
+                    };
+                    _context.MediaCategories.Add(mediaCategory);
+                }
+            }
+
+            // Yönetmenleri ekleyin
+            if (MViewModel.DirectorIds != null)
+            {
+                foreach (int directorId in MViewModel.DirectorIds)
+                {
+                    MediaDirector mediaDirector = new MediaDirector
+                    {
+                        DirectorId = directorId,
+                        MediaId = MViewModel.Media!.Id
+                    };
+                    _context.MediaDirectors.Add(mediaDirector);
+                }
+            }
+
             _context.SaveChanges();
 
-            return media.Id;
+            return MViewModel.Media!.Id;
         }
+
 
         // DELETE: api/Media/5
         //[HttpDelete("{id}")]

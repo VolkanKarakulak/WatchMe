@@ -34,20 +34,20 @@ namespace WatchMe.Controllers
 
         // GET: api/Directors/5
         [HttpGet("{id}")]
-        public ActionResult<Director> GetDirector(int id)
+        public ActionResult<List<MediaDirector>> GetDirector(int id)
         {
           if (_context.Directors == null)
           {
               return NotFound();
           }
-            var director = _context.Directors.Find(id);
+            List<MediaDirector> mediaDirector = _context.MediaDirectors.Where(d => d.DirectorId ==id).Include(n => n.Media).ToList();
 
-            if (director == null)
+            if (mediaDirector == null)
             {
                 return NotFound();
             }
 
-            return director;
+            return mediaDirector;
         }
 
         // PUT: api/Directors/5

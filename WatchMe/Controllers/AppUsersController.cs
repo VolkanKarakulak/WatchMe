@@ -8,10 +8,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Identity.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
+
 
 namespace WatchMe.Controllers
 {
@@ -27,6 +30,17 @@ namespace WatchMe.Controllers
         {
             public string UserName { get; set; }
             public string Password { get; set; }
+        }
+        public struct MediaModel
+        {
+            public Media media { get; set; }
+            public int ViewCount { get; set; }
+        }
+        public struct ChangePasswordModel
+        {
+            public string UserName { get; set; }
+            public string CurrentPassword { get; set; }
+            public string NewPassword { get; set; }
         }
         public AppUsersController(SignInManager<AppUser> signInManager, WatchMeContext context)
         {
@@ -78,7 +92,7 @@ namespace WatchMe.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         //[Authorize]
-        public  ActionResult  PutAppUser(AppUser appUser)
+        public ActionResult  PutAppUser(AppUser appUser)
         {
             AppUser? user = null;
 
@@ -127,13 +141,69 @@ namespace WatchMe.Controllers
                 return identityResult.Errors.FirstOrDefault()!.Description;
             }
 
-           return Ok();
+           return Ok("User Account Created");
 
+        }
+
+        [HttpPut("ActivateUser")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult ActivateUser(long id)
+        {
+            AppUser? appUser = _signInManager.UserManager.FindByIdAsync(id.ToString()).Result;
+
+            if (appUser == null)
+            {
+                return NotFound();
+            }
+            appUser.Passive = false;
+
+            _signInManager.UserManager.UpdateAsync(appUser).Wait();
+            return Ok("User Aktivated");
+        }
+
+
+        //[HttpPost("SetPassword")]
+        //[Authorize]
+        //public ActionResult<string> SetPassword(LogInModel logInModel)
+        //{
+        //    AppUser? appUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result;
+
+        //    if (appUser == null)
+        //    {
+        //        return Problem("User Not Found");
+        //    }
+        //    try
+        //    {
+        //        _signInManager.UserManager.RemovePasswordAsync(appUser).Wait();
+        //        _signInManager.UserManager.AddPasswordAsync(appUser, logInModel.Password).Wait();
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest("Password Set Failed");
+        //    }
+        //    return Ok("Password Set Successfully");
+        //}
+
+        [HttpPost("ChangePassword")]
+        [Authorize]
+        public ActionResult<string> ChangePassword(ChangePasswordModel changePasswordModel)
+        {
+            AppUser? appUser = _signInManager.UserManager.FindByNameAsync(changePasswordModel.UserName).Result;
+            if (appUser == null)
+            {
+                return NotFound("User Not Found");
+            }
+            IdentityResult changePasswordResult = _signInManager.UserManager.ChangePasswordAsync(appUser, changePasswordModel.CurrentPassword, changePasswordModel.NewPassword).Result;
+            if(!changePasswordResult.Succeeded)
+            {
+                return BadRequest("Password change failed");
+            }
+            return Ok("Password Changed Succesfully");
         }
 
         // DELETE: api/AppUsers/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteSoftITOFlixUser(long id)
+        public ActionResult<string> DeleteAppUser(long id)
         {
             AppUser? user = null;
 
@@ -152,68 +222,109 @@ namespace WatchMe.Controllers
             }
             user.Passive = true;
             _signInManager.UserManager.UpdateAsync(user).Wait();
-            return Ok();
+            return Ok("User Deactivated");
         }
+
         [HttpPost("LogIn")]
         public ActionResult<List<Media>> LogIn(LogInModel logInModel)
         {
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
-            AppUser applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result; // Result; async FindByNameAsync metodunun çalışmasını senkron bir şekilde çağırarak sonucunu bekler ve sonucu alır.
+            AppUser appUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result; // Result; async FindByNameAsync metodunun çalışmasını senkron bir şekilde çağırarak sonucunu bekler ve sonucu alır.
+
             List<Media>? medias = null;
             List<UserFavorite> userFavorites;
             IQueryable<Media> mediaQuery;
             IGrouping<short, MediaCategory>? mediaCategories;
             IQueryable<int> userWatcheds;
+            List<MediaModel> mediaModels = new List<MediaModel>();
+           //List<string> media = _context.Medias.Take(3).Select(m => m.Name).ToList(); // sadece 2 adet media listenelir, kolaylık açısından 2 adet seçilmiştir isteğe göre artırılabilir
+         
 
-
-            if (applicationUser == null)
+            if (appUser == null)
             {
                 return NotFound();
             }
-            //if (_context.UserPlans.Where(u => u.UserId == applicationUser.Id && u.EndDate>= DateTime.Today).Any() == false) 
+
+            if (_signInManager.UserManager.GetRolesAsync(appUser).Result.Any(r => r == "Admin" || r == "ContentAdmin" || r == "CustomerRepresentative"))
+            {
+                signInResult = _signInManager.PasswordSignInAsync(appUser, logInModel.Password, false, false).Result;
+
+                if (signInResult.Succeeded)
+                {
+                    return Ok("Admin LoggedIn");
+                }
+            }
+            //if (_context.UserFavorites.Where(u => u.UserId == appUser.Id).Any() == false && _context.UserPlans.Where(k => k.UserId == appUser.Id).Any() == false) // eğer giriş yapan kullanıcının userfavoritesi null ise List mediaları görsün
             //{
-            //    applicationUser.Passive = true;
-            //    _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
+            //    return Ok(media);
+            //}
+
+            //if (_context.UserPlans.Where(u => u.UserId == appUser.Id && u.EndDate >= DateTime.Today).Any() == false)
+            //{
+            //    appUser.Passive = true;
+            //    _signInManager.UserManager.UpdateAsync(appUser).Wait();
+            //    return Ok(new { Message = "User LoggedIn", Önerilenler = media });
 
             //}
-            //if (applicationUser.Passive == true)
+            //if (appUser.Passive == true)
             //{
             //    return Content("Passive");
             //}
-            signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
+            signInResult = _signInManager.PasswordSignInAsync(appUser, logInModel.Password, false, false).Result;
+
+            if (signInResult.Succeeded == false)
+            {
+                return BadRequest("Login failed. Please Check Your Credentials");
+            }
+
             if (signInResult.Succeeded == true)
             {
-                //Kullanıcının favori olarak işaretlediği mediaları ve kategorilerini alıyoruz.
-                userFavorites = _context.UserFavorites.Where(u => u.UserId == applicationUser.Id).Include(u => u.Media).Include(u => u.Media!.MediaCategories).ToList();
-                //userFavorites içindeki media kategorilerini ayıklıyoruz (SelectMany)
-                //Bunları kategori id'lerine göre grupluyoruz (GroupBy)
-                //Her grupta kaç adet item olduğuna bakıp (m.Count())
-                //Çoktan aza doğru sıralıyoruz (OrderByDescending)
-                //En üstteki, yani en çok item'a sahip grubu seçiyoruz (FirstOrDefault)
+                userFavorites = _context.UserFavorites.Where(u => u.UserId == appUser.Id).Include(u => u.Media).Include(u => u.Media!.MediaCategories).ToList();
+                
                 mediaCategories = userFavorites.SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
                 if (mediaCategories != null)
                 {
-                    //Kullabıcının izlediği episode'lardan media'ya ulaşıp, sadece media id'lerini alıyoruz (Select)
-                    //Tekrar eden media id'leri eliyoruz (Distinct)
-                    userWatcheds = _context.UserWatcheds.Where(u => u.UserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
-                    //Öneri yapmak için mediaCategories.Key'i yani kullanıcının en çok favorilediği kategori id'sini kullanıyoruz
-                    //Media listesini çekerken sadece bu kategoriye ait mediaların MediaCategories listesini dolduruyoruz (Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)))
-                    //Diğer mediaların MediaCategories listeleri boş kalıyor
-                    //Sonrasında MediaCategories'i boş olmayan media'ları filtreliyoruz (m.MediaCategories!.Count > 0)
-                    //Ayrıca bu kategoriye giren fakat kullanıcının izlemiş olduklarını da dışarıda bırakıyoruz (userWatcheds.Contains(m.Id) == false)
+                    userWatcheds = _context.UserWatcheds.Where(u => u.UserId == appUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
+                    
                     mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)).Where(m => m.MediaCategories!.Count > 0 && userWatcheds.Contains(m.Id) == false);
-                    if (applicationUser.Restriction != null)
+                    if (appUser.Restriction != null)
                     {
                         //TO DO
                         //Son olarak, kullanıcı bir restrictiona sahipse seçilen media içerisinden bunları da çıkarmamız gerekiyor.
-                        mediaQuery = mediaQuery.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= applicationUser.Restriction));
+                        mediaQuery = mediaQuery.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= appUser.Restriction));
                     }
-                    medias = mediaQuery.ToList();
+                    else
+                    {
+                        //Favoriler boşsa yeni bir kullanıcıysa
+                        mediaQuery = _context.Medias.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= appUser.Restriction));
+                    }
+
+                    // Her bir medya için izlenme sayısını hesapla ve populatMedias listesine ekle
+                    var mediamodels = mediaQuery.Select(med => new MediaModel
+                    {
+                        media = med,
+
+                        ViewCount = _context.UserWatcheds.Include(uw => uw.Episode!.Media).Count(uw => uw.Episode!.MediaId == med.Id)
+                    }
+                    ).OrderByDescending(m => m.ViewCount).Take(2).ToList();
+                    
+                    // Şimdi, Media nesnelerini içeren bir koleksiyon oluşturabiliriz
+                    var topMedias = mediamodels.Select(mvm => mvm.media).ToList();
                 }
-                //Populate medias
+               
             }
             return medias;
         }
+
+        [HttpPost("Logout")]
+        //[Authorize]
+        public ActionResult LogOut()
+        {
+             _signInManager.SignOutAsync().Wait();
+
+            return Ok("Successful Logout");
+        }
+
     }
 }
 
