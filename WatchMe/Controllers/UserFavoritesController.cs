@@ -37,6 +37,7 @@ namespace WatchMe.Controllers
         //}
 
         [HttpGet("WithUserId")]
+        [Authorize]
         public async Task<ActionResult<List<Media>>> GetUserFavorites(long userId)
         {
             var appUser = await _signInManager.UserManager.FindByIdAsync(userId.ToString());
@@ -62,6 +63,7 @@ namespace WatchMe.Controllers
 
         // GET: api/UserFavorites/5
         [HttpGet("{eMail}")]
+        [Authorize]
         public async Task<ActionResult<List<UserFavorite>>> GetUserFavorites(string eMail)
         {
             // Kullanıcıyı bul
@@ -92,6 +94,7 @@ namespace WatchMe.Controllers
         // POST: api/UserFavorites
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<UserFavorite>> PostUserFavorite(UserFavorite userFavorite)
         {
           if (_context.UserFavorites == null)

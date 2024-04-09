@@ -25,7 +25,8 @@ namespace WatchMe.Controllers
 
         // GET: api/Restrictions
         [HttpGet]
-        public ActionResult<IEnumerable<Restriction>> GetRestrictions()
+        [Authorize]
+        public ActionResult<List<Restriction>> GetRestrictions()
         {
           if (_context.Restrictions == null)
           {
@@ -36,6 +37,7 @@ namespace WatchMe.Controllers
 
         // GET: api/Restrictions/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<Restriction> GetRestriction(byte id)
         {
             if (_context.Restrictions == null)
@@ -55,6 +57,7 @@ namespace WatchMe.Controllers
         // PUT: api/Restrictions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public IActionResult PutRestriction(byte id, Restriction restriction)
         {
             if (id != restriction.Id)
@@ -86,6 +89,7 @@ namespace WatchMe.Controllers
         // POST: api/Restrictions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<Restriction> PostRestriction(Restriction restriction)
         {
           if (_context.Restrictions == null)
@@ -114,6 +118,7 @@ namespace WatchMe.Controllers
 
         // DELETE: api/Restrictions/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public IActionResult DeleteRestriction(byte id)
         {
             if (_context.Restrictions == null)

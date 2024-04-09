@@ -50,7 +50,7 @@ namespace WatchMe.Controllers
 
         // GET: api/AppUsers
         [HttpGet]
-        //[Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<AppUser>> GetUsers(bool includePassive = true)
         {
             IQueryable<AppUser> users = _signInManager.UserManager.Users;
@@ -64,18 +64,18 @@ namespace WatchMe.Controllers
 
         // GET: api/AppUsers/5
         [HttpGet("{id}")]
-        //[Authorize]
+        [Authorize]
         public ActionResult<AppUser> GetAppUser(long id)
         {
             AppUser? appUser = null;
 
-            //if (User.IsInRole("Admin") == false)
-            //{
-            //    if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
-            //    {
-            //        return Unauthorized();
-            //    }
-            //}
+            if (User.IsInRole("Admin") == false)
+            {
+                if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
+                {
+                    return Unauthorized();
+                }
+            }
 
             appUser = _signInManager.UserManager.Users.Where(u => u.Id == id).FirstOrDefault();
             
@@ -91,7 +91,7 @@ namespace WatchMe.Controllers
         // PUT: api/AppUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        //[Authorize]
+        [Authorize]
         public ActionResult  PutAppUser(AppUser appUser)
         {
             AppUser? user = null;
@@ -203,6 +203,7 @@ namespace WatchMe.Controllers
 
         // DELETE: api/AppUsers/5
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult<string> DeleteAppUser(long id)
         {
             AppUser? user = null;
@@ -231,7 +232,7 @@ namespace WatchMe.Controllers
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
             AppUser appUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result; // Result; async FindByNameAsync metodunun çalışmasını senkron bir şekilde çağırarak sonucunu bekler ve sonucu alır.
 
-            List<Media>? medias = null;
+            List<Media>? topMedias = null;
             List<UserFavorite> userFavorites;
             IQueryable<Media> mediaQuery;
             IGrouping<short, MediaCategory>? mediaCategories;
@@ -305,15 +306,16 @@ namespace WatchMe.Controllers
                         media = med,
 
                         ViewCount = _context.UserWatcheds.Include(uw => uw.Episode!.Media).Count(uw => uw.Episode!.MediaId == med.Id)
+
                     }
                     ).OrderByDescending(m => m.ViewCount).Take(2).ToList();
                     
                     // Şimdi, Media nesnelerini içeren bir koleksiyon oluşturabiliriz
-                    var topMedias = mediamodels.Select(mvm => mvm.media).ToList();
+                    topMedias = mediamodels.Select(mvm => mvm.media).ToList();
                 }
                
             }
-            return medias;
+            return topMedias;
         }
 
         [HttpPost("Logout")]

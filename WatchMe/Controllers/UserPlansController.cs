@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,7 @@ namespace WatchMe.Controllers
 
         // GET: api/UserPlans
         [HttpGet]
+        [Authorize("Admin")]
         public ActionResult<List<UserPlanViewModel>> GetUserPlans()
         {
           List<UserPlan> userPlans = _context.UserPlans
@@ -55,6 +57,7 @@ namespace WatchMe.Controllers
 
         // GET: api/UserPlans/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<List<UserPlanViewModel>> GetUserPlan(long id)
         {
             AppUser appUser = _signInManager.UserManager.FindByIdAsync(id.ToString()).Result;

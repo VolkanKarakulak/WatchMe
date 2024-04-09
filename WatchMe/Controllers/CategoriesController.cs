@@ -33,7 +33,7 @@ namespace WatchMe.Controllers
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-       //[Authorize]
+        [Authorize]
         public ActionResult<List<MediaCategory>> GetCategory(short id)
         {
          
@@ -101,7 +101,7 @@ namespace WatchMe.Controllers
 
 
         [HttpPut]
-        //[Authorize(Roles = "ContentAdmin")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult PutCategory(Category category)
         {
 
@@ -122,7 +122,7 @@ namespace WatchMe.Controllers
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        //[Authorize(Roles = "ContentAdmin")]
+        [Authorize(Roles = "ContentAdmin")]
         public short PostCategory(Category category)
         {
             _context.Categories.Add(category);

@@ -25,6 +25,7 @@ namespace WatchMe.Controllers
 
         // GET: api/Stars
         [HttpGet]
+        [Authorize]
         public ActionResult<List<Star>> GetStars()
         {
           if (_context.Stars == null)
@@ -36,6 +37,7 @@ namespace WatchMe.Controllers
 
         // GET: api/Stars/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<Star> GetStar(int id)
         {
           
@@ -50,7 +52,7 @@ namespace WatchMe.Controllers
         }
 
         [HttpGet("mediastars/{starId}")]
-        //[Authorize]
+        [Authorize]
         public ActionResult<List<MediaStarViewModel>> GetMediaStar(int starId)
         {
             List<MediaStarViewModel> mediaStars = _context.MediaStars
@@ -75,6 +77,7 @@ namespace WatchMe.Controllers
         // PUT: api/Stars/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize("ContentAdmin")]
         public ActionResult PutStar(int id, Star star)
         {
             if (id != star.Id)
@@ -106,6 +109,7 @@ namespace WatchMe.Controllers
         // POST: api/Stars
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize("ContentAdmin")]
         public ActionResult<Star> PostStar(Star star)
         {
           if (_context.Stars == null)
@@ -120,6 +124,7 @@ namespace WatchMe.Controllers
 
         // DELETE: api/Stars/5
         [HttpDelete("{id}")]
+        [Authorize("ContentAdmin")]
         public ActionResult DeleteStar(int id)
         {
             if (_context.Stars == null)

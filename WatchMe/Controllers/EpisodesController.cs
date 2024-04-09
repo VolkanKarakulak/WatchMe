@@ -26,6 +26,7 @@ namespace WatchMe.Controllers
 
         // GET: api/Episodes
         [HttpGet]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<List<EpisodeViewModel>> GetEpisodes(int mediaId, byte seasonNumber)
         {
             var episodes = _context.Episodes
@@ -76,6 +77,7 @@ namespace WatchMe.Controllers
         // PUT: api/Episodes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult PutEpisode(long id, Episode episode)
         {
             if (id != episode.Id)
@@ -101,6 +103,7 @@ namespace WatchMe.Controllers
         // POST: api/Episodes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<Episode> PostEpisode(Episode episode)
         {
           if (_context.Episodes == null)
@@ -115,6 +118,7 @@ namespace WatchMe.Controllers
 
         // DELETE: api/Episodes/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeleteEpisode(long id)
         {
             var episode = _context.Episodes.Find(id);

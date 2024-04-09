@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,7 @@ namespace WatchMe.Controllers
         // PUT: api/Plans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public IActionResult PutPlan(short id, Plan plan)
         {
             if (id != plan.Id)
@@ -97,6 +99,7 @@ namespace WatchMe.Controllers
         // POST: api/Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<Plan> PostPlan(Plan plan)
         {
           if (_context.Plans == null)
@@ -111,6 +114,7 @@ namespace WatchMe.Controllers
 
         // DELETE: api/Plans/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeletePlan(short id)
         {
             if (_context.Plans == null)
