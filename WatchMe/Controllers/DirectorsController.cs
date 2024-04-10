@@ -38,7 +38,7 @@ namespace WatchMe.Controllers
         // GET: api/Directors/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<List<MediaInfoViewModel>> GetDirectorMedia(int id)
+        public ActionResult<List<MediaDirectorViewModel>> GetDirectorMedia(int id)
         {
             var directorMedia = _context.MediaDirectors
                 .Where(md => md.DirectorId == id)
@@ -50,7 +50,7 @@ namespace WatchMe.Controllers
                 return NotFound();
             }
 
-            var mediaInfoList = directorMedia.Select(md => new MediaInfoViewModel
+            var mediaInfoList = directorMedia.Select(md => new MediaDirectorViewModel
             {
                 MediaName = md.Media?.Name,               
                 IsPassive = md.Media?.Passive

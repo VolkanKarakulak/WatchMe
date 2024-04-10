@@ -77,13 +77,11 @@ namespace WatchMe.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize]
-        public int PostMedia(MediaViewModel MViewModel)
+        public int PostMedia(MediaPostViewModel MViewModel)
         {
-            // Medya bilgisini ekleyin
             _context.Medias.Add(MViewModel.Media!);
             _context.SaveChanges();
 
-            // Yıldızları ekleyin
             if (MViewModel.StarIds != null)
             {
                 foreach (int starId in MViewModel.StarIds)
@@ -97,7 +95,6 @@ namespace WatchMe.Controllers
                 }
             }
 
-            // Kategorileri ekleyin
             if (MViewModel.CategoryIds != null)
             {
                 foreach (short categoryId in MViewModel.CategoryIds)
@@ -111,7 +108,6 @@ namespace WatchMe.Controllers
                 }
             }
 
-            // Yönetmenleri ekleyin
             if (MViewModel.DirectorIds != null)
             {
                 foreach (int directorId in MViewModel.DirectorIds)

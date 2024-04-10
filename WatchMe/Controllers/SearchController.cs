@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using WatchMe.Data;
 using WatchMe.Models;
+using WatchMe.ViewModels;
 
 namespace WatchMe.Controllers
 {
@@ -19,8 +20,8 @@ namespace WatchMe.Controllers
         }
 
         [HttpPost("Search")]
-        [Authorize]
-        public ActionResult<List<Media>> Search(string searchTerm)
+        //[Authorize]
+        public ActionResult<List<MediaDirectorViewModel>> Search(string searchTerm)
         {
             if (string.IsNullOrEmpty(searchTerm))
             {
@@ -28,13 +29,29 @@ namespace WatchMe.Controllers
             }
 
             var mediaQuery = _context!.Medias
-                .Include(m => m.MediaCategories)
+                .Include(m => m.MediaCategories!)
+                    .ThenInclude(mc => mc.Category)
+                .Include(m => m.MediaDirectors!)
+                    .ThenInclude(md => md.Directors)
+                .Include(m => m.MediaRestrictions!)
+                    .ThenInclude(md => md.Restrictions)
                 .Where(m => m.Name.Contains(searchTerm) || m.Description!.Contains(searchTerm));
 
             var mediaList = mediaQuery.ToList();
 
-            return Ok(mediaList);
+            var mediaViewModelList = mediaList.Select(media => new SearchMediaViewModel
+            {
+                MediaName = media.Name,
+                Description = media.Description,
+                IMDBRating = media.IMDBRating,
+                Categories = media.MediaCategories?.Select(mc => mc.Category!.Name).ToList() ?? new List<string>(),
+                Directors = media.MediaDirectors?.Select(md => md.Directors!.Name).ToList() ?? new List<string>(),
+                Restriction = media.MediaRestrictions?.Select(mr => mr.Restrictions!.Name).ToList() ?? new List<string>()
+            }).ToList();
+
+            return Ok(mediaViewModelList);
         }
+
     }
 }
 

@@ -2,7 +2,7 @@
 
 namespace WatchMe.ViewModels
 {
-    public class MediaViewModel
+    public class MediaPostViewModel
     {
         public Media? Media { get; set; }
         public List<int>? StarIds { get; set; }
