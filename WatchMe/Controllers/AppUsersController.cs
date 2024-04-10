@@ -290,17 +290,14 @@ namespace WatchMe.Controllers
                     mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)).Where(m => m.MediaCategories!.Count > 0 && userWatcheds.Contains(m.Id) == false);
                     if (appUser.Restriction != null)
                     {
-                        //TO DO
-                        //Son olarak, kullanıcı bir restrictiona sahipse seçilen media içerisinden bunları da çıkarmamız gerekiyor.
+                     
                         mediaQuery = mediaQuery.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= appUser.Restriction));
                     }
                     else
                     {
-                        //Favoriler boşsa yeni bir kullanıcıysa
                         mediaQuery = _context.Medias.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= appUser.Restriction));
                     }
 
-                    // Her bir medya için izlenme sayısını hesapla ve populatMedias listesine ekle
                     var mediamodels = mediaQuery.Select(med => new MediaModel
                     {
                         media = med,
@@ -315,7 +312,7 @@ namespace WatchMe.Controllers
                 }
                
             }
-            return topMedias;
+            return topMedias!;
         }
 
         [HttpPost("Logout")]

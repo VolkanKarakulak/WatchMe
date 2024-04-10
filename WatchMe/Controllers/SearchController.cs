@@ -20,7 +20,7 @@ namespace WatchMe.Controllers
 
         [HttpPost("Search")]
         [Authorize]
-        public async Task<ActionResult<List<Media>>> Search(string searchTerm)
+        public ActionResult<List<Media>> Search(string searchTerm)
         {
             if (string.IsNullOrEmpty(searchTerm))
             {
@@ -31,10 +31,12 @@ namespace WatchMe.Controllers
                 .Include(m => m.MediaCategories)
                 .Where(m => m.Name.Contains(searchTerm) || m.Description!.Contains(searchTerm));
 
-            var mediaList = await mediaQuery.ToListAsync();
+            var mediaList = mediaQuery.ToList();
 
             return Ok(mediaList);
         }
-
     }
 }
+
+
+
