@@ -27,14 +27,10 @@ namespace WatchMe.Controllers
                 return BadRequest("Search term cannot be empty");
             }
 
-            // Search for media using the search term
             var mediaQuery = _context!.Medias
                 .Include(m => m.MediaCategories)
                 .Where(m => m.Name.Contains(searchTerm) || m.Description.Contains(searchTerm));
 
-            // Apply filters based on user preferences or other criteria (optional)
-
-            // Convert to a list of Media objects
             var mediaList = await mediaQuery.ToListAsync();
 
             return Ok(mediaList);
