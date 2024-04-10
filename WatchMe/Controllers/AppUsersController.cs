@@ -326,24 +326,3 @@ namespace WatchMe.Controllers
 
     }
 }
-
-
-// Önerilerin Uzun Yöntemi
-// userFavorites = _context.UserFavorites.Where(u => u.UserId == applicationUser.Id);
-//userFavorites = userFavorites.Include(u => u.Media);
-//userFavorites = userFavorites.Include(u => u.Media!.MediaCategories);
-//mediaCategories = userFavorites.ToList().SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
-
-//if (mediaCategories != null)
-//{
-//    userWatcheds = _context.UserWatcheds.Where(u => u.UserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
-//    mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategories.Key)).Where(m => userWatcheds.Contains(m.Id) == false);
-//    if (applicationUser.Restriction != null)
-//    {
-//        mediaQuery = mediaQuery.Include(m => m.MediaRestrictions!.Where(r => r.RestrictionId <= applicationUser.Restriction));
-//    }
-
-//    medias = mediaQuery.ToList();
-//}
-//            }
-//            return medias;
