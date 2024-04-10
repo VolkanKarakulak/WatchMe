@@ -24,12 +24,12 @@ namespace WatchMe.Controllers
         {
             if (string.IsNullOrEmpty(searchTerm))
             {
-                return BadRequest("Search term cannot be empty");
+                return BadRequest("Search Term Can't be Empty");
             }
 
             var mediaQuery = _context!.Medias
                 .Include(m => m.MediaCategories)
-                .Where(m => m.Name.Contains(searchTerm) || m.Description.Contains(searchTerm));
+                .Where(m => m.Name.Contains(searchTerm) || m.Description!.Contains(searchTerm));
 
             var mediaList = await mediaQuery.ToListAsync();
 
