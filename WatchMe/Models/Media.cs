@@ -6,7 +6,6 @@ namespace WatchMe.Models
 {
     public class Media
     {
-      
         public int Id { get; set; }
         [StringLength(200, MinimumLength = 2)]
         [Column(TypeName = "nvarchar(200)")]
@@ -14,7 +13,6 @@ namespace WatchMe.Models
         [StringLength(500)]
         [Column(TypeName = "nvarchar(500)")]
         public string? Description { get; set; }
-
         public bool Passive { get; set; }
         public List<MediaCategory>? MediaCategories { get; set; }
 
@@ -26,8 +24,6 @@ namespace WatchMe.Models
 
         [Range(0, 10)]
         public float IMDBRating { get; set; }
-
-
 
     }
 }

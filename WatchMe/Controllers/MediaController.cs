@@ -26,29 +26,59 @@ namespace WatchMe.Controllers
         // GET: api/Media
         [HttpGet]
         [Authorize]
-        public ActionResult<List<Media>> GetMedias()
+        public ActionResult<List<MediaGetViewModel>> GetMedias()
         {
-            return _context.Medias.Include(x => x.MediaCategories)!.ThenInclude(x=> x.Category).AsNoTracking().ToList();
+            var  medialist = _context!.Medias
+                .Include(x => x.MediaRestrictions!).ThenInclude(x => x.Restrictions)
+                .Include(x => x.MediaCategories!).ThenInclude(x => x.Category)
+                .Include(x => x.MediaDirectors!).ThenInclude(x => x.Directors)
+                .Include(x => x.MediaStars!).ThenInclude(x => x.Star)
+                .AsNoTracking()
+                .Select(m => new MediaGetViewModel
+                {
+                    MediaName = m.Name,
+                    Description = m.Description,
+                    IsPassive = m.Passive,
+                    IMDBRating = m.IMDBRating,
+                    RestrictionNames = m.MediaRestrictions!.Select(mr => mr.Restrictions!.Name).ToList(),
+                    CategoryNames = m.MediaCategories!.Select(mc => mc.Category!.Name).ToList(),
+                    DirectorNames = m.MediaDirectors!.Select(md => md.Directors!.Name).ToList(),
+                    StarNames = m.MediaStars!.Select(ms => ms.Star!.Name).ToList()
+                }).ToList();
+
+            return medialist;
         }
 
         // GET: api/Media/5
         [HttpGet("{id}")]
-        [Authorize]
-        public ActionResult<Media> GetMedia(int id)
+        //[Authorize]
+        public ActionResult<MediaGetViewModel> GetMedia(int id)
         {
             Media? media = _context.Medias.Find(id);
-
+            List<MediaRestriction>? mediaRestrictions = _context.MediaRestrictions.Where(u => u.MediaId == id).Include(u => u.Restrictions).ToList();
             List<MediaCategory>? mediaCategory = _context.MediaCategories.Where(u => u.MediaId == id).Include(u => u.Category).ToList();
-            List<MediaDirector>? mediaDirector = _context.MediaDirectors.Where( d => d.MediaId == id).Include(d => d.Directors).ToList();
-            List<MediaStar>? mediaStar = _context.MediaStars.Where( d => d.MediaId == id).Include(d => d.Star).ToList();
-           
+            List<MediaDirector>? mediaDirector = _context.MediaDirectors.Where(d => d.MediaId == id).Include(d => d.Directors).ToList();
+            List<MediaStar>? mediaStar = _context.MediaStars.Where(d => d.MediaId == id).Include(d => d.Star).ToList();
+
             if (media == null)
             {
                 return NotFound();
             }
-            return media;
-        }
 
+            var viewModel = new MediaGetViewModel
+            {
+                MediaName = media.Name,
+                Description = media.Description,
+                IsPassive = media.Passive,
+                IMDBRating = media.IMDBRating,
+                RestrictionNames = mediaRestrictions?.Select(mr => mr.Restrictions!.Name).ToList() ?? new List<string>(),
+                CategoryNames = mediaCategory?.Select(mc => mc.Category!.Name).ToList() ?? new List<string>(),
+                DirectorNames = mediaDirector?.Select(md => md.Directors!.Name).ToList() ?? new List<string>(),
+                StarNames = mediaStar?.Select(ms => ms.Star!.Name).ToList() ?? new List<string>()
+            };
+
+            return viewModel;
+        }
         // PUT: api/Media/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
